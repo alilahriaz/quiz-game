@@ -5,7 +5,7 @@ require 'sinatra'
 # Dotenv.load
 
 set :static, true
-# set :public_folder, File.join(File.dirname(__FILE__), ENV['STATIC_DIR'])
+set :public_folder, 'client'
 # set :views, File.join(File.dirname(__FILE__), ENV['STATIC_DIR'])
 set :port, 4242
 
@@ -13,7 +13,7 @@ CONSTANTS = {
     FLAGS: {
         uk: {
             name: "England",
-            image_url: "https://www.countryflags.io/en/flat/64.png",
+            image_url: "https://www.countryflags.io/gb/flat/64.png",
         },
         us: {
             name: "United States of America",
@@ -104,7 +104,10 @@ $questions_sent = []
 # Endpoints
 
 get '/' do
-    "hello this is up"
+    # "hello this is up"
+
+    content_type 'text/html'
+    send_file File.join(settings.public_folder, 'index.html')
 end
 
 post '/question' do
@@ -143,12 +146,12 @@ def createMultipleChoiceQuestion()
 
     result = {
         image: CONSTANTS[:FLAGS][answer.to_sym][:image_url],
-        options: [
-            {questions[0].to_sym => CONSTANTS[:FLAGS][questions[0].to_sym] },
-            {questions[1].to_sym => CONSTANTS[:FLAGS][questions[1].to_sym] },
-            {questions[2].to_sym => CONSTANTS[:FLAGS][questions[2].to_sym] },
-            {questions[3].to_sym => CONSTANTS[:FLAGS][questions[3].to_sym] },
-        ]
+        options: {
+            questions[0].to_sym => CONSTANTS[:FLAGS][questions[0]][:name] ,
+            questions[1].to_sym => CONSTANTS[:FLAGS][questions[1]][:name] ,
+            questions[2].to_sym => CONSTANTS[:FLAGS][questions[2]][:name] ,
+            questions[3].to_sym => CONSTANTS[:FLAGS][questions[3]][:name] ,
+        }
     }
     # puts result
     return result
