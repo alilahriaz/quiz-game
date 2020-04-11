@@ -99,7 +99,7 @@ CONSTANTS = {
 }
 
 $answered_questions = Set[]
-$correct_answers = Set[]
+$questions_sent = []
 
 # Endpoints
 
@@ -108,28 +108,38 @@ get '/' do
 end
 
 post '/question' do
-    result = createMultipleChoiceQuestions()
+    result = createMultipleChoiceQuestion()
+    return result.to_json
+end
+
+post '/answer' do
+    data = JSON.parse(request.body.read, symbolize_names: true)
+    answer = data[:answer].to_sym
+    puts "Player's answer was"
+    puts answer
+
+    result = checkAnswer(answer)
+
     return result.to_json
 end
 
 # Helpers
 
-def createMultipleChoiceQuestions()    
+def createMultipleChoiceQuestion()    
     all_keys = CONSTANTS[:FLAGS].keys
     questions = []
 
     questions[0] = selectDedupedAnswerKey()
     answer = questions[0]
+    $questions_sent.push(answer)
+
+    puts "Question's answer is"
+    puts answer
     
     for i in 1..3
         questions[i] = selectDedupedOptionKey(questions[0])
     end
-
     questions.shuffle
-
-    puts "questions are:"
-    # puts questions
-    # return questions
 
     result = {
         image: CONSTANTS[:FLAGS][answer.to_sym][:image_url],
@@ -140,7 +150,7 @@ def createMultipleChoiceQuestions()
             {questions[3].to_sym => CONSTANTS[:FLAGS][questions[3].to_sym] },
         ]
     }
-    puts result
+    # puts result
     return result
 end
 
@@ -165,4 +175,33 @@ def selectDedupedOptionKey(answer)
     end
     return selected_key
 end
+
+def lastQuestionsAnswer()
+    return $questions_sent[-1]
+end
+
+
+def checkAnswer(answer)
+    result = {
+        correct: false,
+    }
+
+    if (answer == lastQuestionsAnswer())
+        result = {
+            correct: true,
+        }
+
+        $answered_questions.add(answer)
+        puts "Player answered CORRECTLY!!"
+    else
+        puts "Player answered incorrectly"
+    end
+
+    return result
+end
+
+
+# test my question/answer code
+# createMultipleChoiceQuestion()
+# checkAnswer($questions_sent[-1])
 
