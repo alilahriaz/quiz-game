@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    dotenv (2.7.5)
+    json (2.3.0)
+    stripe (5.17.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  dotenv
+  json
+  stripe
+
+BUNDLED WITH
+   1.17.1
