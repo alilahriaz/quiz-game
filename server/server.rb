@@ -19,6 +19,7 @@ CONSTANTS = {
 ANSWERED_LIMIT = 8
 
 $answered_questions = Set[]
+$current_sessions = Set[]
 $answers_tested = []
 
 # Endpoints
@@ -57,7 +58,12 @@ end
 def createSession()
     session_id = rand(100000)
 
-    sessions.push(:session_id)
+    while ($current_sessions.include?(session_id))
+        session_id = rand(100000)
+    end
+    
+    $current_sessions.add(:session_id)
+    return session_id
 end
 
 def createMultipleChoiceQuestion()    
@@ -144,3 +150,4 @@ end
 # test my question/answer code
 # createMultipleChoiceQuestion()
 # checkAnswer($questions_sent[-1])
+# fix deduping logic

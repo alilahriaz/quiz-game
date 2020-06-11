@@ -85,10 +85,11 @@ function answerButtonPressed(buttonNumber) {
     .then((response) => response.json())
     .then((data) => {
         if (data.correct) {
-            alert("Correct answer!");
+            alert("CORRECT answer!!!");
+            location.reload();
         }
         else {
-            alert("Wrong answer");
+            alert("Wrong answer :(");
         }
     });
 }
