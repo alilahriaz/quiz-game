@@ -16,6 +16,7 @@ CONSTANTS = {
     FLAGS: countries_hash,
 }
 
+TOTAL_QUESTIONS = 10
 $current_sessions = {}
 
 # Endpoints
@@ -62,7 +63,8 @@ def createSession()
     
     $current_sessions[session_id.to_s] = {
         answered_questions: Set[],
-        answers_tested: []
+        answers_tested: [],
+        answer_results: [],
     }
 
     return session_id
@@ -94,7 +96,8 @@ def createMultipleChoiceQuestion(session_id)
             choices[1].to_sym => CONSTANTS[:FLAGS][choices[1]][:name] ,
             choices[2].to_sym => CONSTANTS[:FLAGS][choices[2]][:name] ,
             choices[3].to_sym => CONSTANTS[:FLAGS][choices[3]][:name] ,
-        }
+        },
+        question_number: answers_tested_for_session.count,
     }
     return result
 end
@@ -130,14 +133,19 @@ end
 
 
 def checkAnswer(session_id, answer)
+    correct_answer_id = currentQuestionAnswer(session_id)
+    correct_answer_full_string = CONSTANTS[:FLAGS][correct_answer_id][:name]
+
     result = {
+        correct_answer: correct_answer_full_string,
         correct: false,
+        complete: false,
+        score: 0,
+        total_questions: TOTAL_QUESTIONS,
     }
 
-    if (answer == currentQuestionAnswer(session_id))
-        result = {
-            correct: true,
-        }
+    if (answer == correct_answer_id)
+        result[:correct] = true
 
         updateAnsweredQuestionsForSession(session_id, answer)
         puts "Answer CORRECT!!"
@@ -145,11 +153,43 @@ def checkAnswer(session_id, answer)
         puts "Answer wrong"
     end
 
+    updateAnsweredResult(session_id, result[:correct])
+
+    if (doneAllQuestions(session_id))
+        result[:complete] = true
+        result[:score] = calculateScore(session_id)
+    end
+
     return result
+end
+
+def doneAllQuestions(session_id)
+    answers_tested_for_session = grabSessionObjectById(session_id)[:answers_tested]
+    return answers_tested_for_session.count >= TOTAL_QUESTIONS
 end
 
 def grabSessionObjectById(session_id)
     return $current_sessions[session_id.to_s]
+end
+
+def updateAnsweredResult(session_id, result)
+    session_object = grabSessionObjectById(session_id)
+    session_object[:answer_results].push(result)
+end
+
+def calculateScore(session_id)
+    session_object = grabSessionObjectById(session_id)
+    answer_results = session_object[:answer_results]
+    
+    score = 0
+
+    for answer in answer_results
+        if answer
+            score += 1
+        end
+    end
+
+    return score
 end
 
 # test my question/answer code

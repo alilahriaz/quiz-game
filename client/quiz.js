@@ -15,7 +15,6 @@ var session_id = null;
 
 // fetch questions on 
 document.addEventListener("DOMContentLoaded", function() {
-
     fetchSession();
 });
 
@@ -39,6 +38,9 @@ option4Button.addEventListener('click', (e) => {
 
     answerButtonPressed(3);
 });
+
+questionNumberLabel = document.getElementById('question-number-label');
+correctAnswerLabel = document.getElementById('correct-answer-label');
 
 // Helpers
 
@@ -92,6 +94,7 @@ function setupUIWithData(data) {
         
         counter++;
     }
+    questionNumberLabel.innerHTML = 'Question ' + data.question_number;
 }
 
 function answerButtonPressed(buttonNumber) {
@@ -109,11 +112,18 @@ function answerButtonPressed(buttonNumber) {
     .then((response) => response.json())
     .then((data) => {
         if (data.correct) {
-            alert("CORRECT answer!!!");
-            fetchQuestion();
+            alert("Correct answer! :)");
         }
         else {
-            alert("Wrong answer :(");
+            alert("Sorry, wrong answer :(\nCorrect answer is " + data.correct_answer);
+        }
+
+        if (data.complete) {
+            alert("Congrats! Quiz Complete!\nYour score is " + data.score + " / " + data.total_questions)
+            location.reload();
+        }
+        else {
+            fetchQuestion();
         }
     });
 }
