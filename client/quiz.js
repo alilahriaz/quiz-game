@@ -9,12 +9,14 @@ optionButtons = [option1Button, option2Button, option3Button, option4Button]
 
 var allOptions = {};
 var optionKeys = [];
+var session_id = null;
 
 // Event handlers
 
 // fetch questions on 
 document.addEventListener("DOMContentLoaded", function() {
-    fetchQuestion();
+
+    fetchSession();
 });
 
 option1Button.addEventListener('click', (e) => {
@@ -40,9 +42,30 @@ option4Button.addEventListener('click', (e) => {
 
 // Helpers
 
+function fetchSession() {
+    fetch('/session', {
+        method: 'POST',
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        session_id = data.session_id;
+        console.log("Session ID is", session_id);
+        fetchQuestion();
+    });
+}
+
 function fetchQuestion() {
+    var body = JSON.stringify({
+        session_id: session_id,
+    });
+    console.log("Body is", body);
+
+
     fetch('/question', {
         method: 'POST',
+        body: JSON.stringify({
+            session_id: session_id,
+        })
     })
     .then((response) => response.json())
     .then((data) => {
@@ -79,6 +102,7 @@ function answerButtonPressed(buttonNumber) {
     fetch('/answer', {
         method: 'POST',
         body: JSON.stringify({
+            session_id: session_id,
             answer: answerKey,
         })
     })
@@ -86,7 +110,7 @@ function answerButtonPressed(buttonNumber) {
     .then((data) => {
         if (data.correct) {
             alert("CORRECT answer!!!");
-            location.reload();
+            fetchQuestion();
         }
         else {
             alert("Wrong answer :(");
