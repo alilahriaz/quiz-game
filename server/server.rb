@@ -1,8 +1,5 @@
-# require 'dotenv'
 require 'rubygems'
 require 'sinatra'
-
-# Dotenv.load
 
 set :static, true
 set :public_folder, 'client'
@@ -146,13 +143,9 @@ def checkAnswer(session_id, answer)
 
     if (answer == correct_answer_id)
         result[:correct] = true
-
-        updateAnsweredQuestionsForSession(session_id, answer)
-        puts "Answer CORRECT!!"
-    else
-        puts "Answer wrong"
     end
 
+    updateAnsweredQuestionsForSession(session_id, answer)
     updateAnsweredResult(session_id, result[:correct])
 
     if (doneAllQuestions(session_id))
